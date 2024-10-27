@@ -1,8 +1,14 @@
-function mttree(category, selectCategory) {
-  let mainCategories = [];
-  let TreeNodes = [];
-  let loading = true;
-  let selectedNodeId = null;
+import React, { useState, useEffect } from 'react';
+
+const MtTree = ({ category, selectCategory }) => {
+  const [mainCategories, setMainCategories] = useState([]);
+  const [treeNodes, setTreeNodes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedNodeId, setSelectedNodeId] = useState(null);
+
+  useEffect(() => {
+    init();
+  }, [category]);
 
   const init = () => {
     if (category && category.length > 0) {
@@ -10,123 +16,94 @@ function mttree(category, selectCategory) {
         ...cat,
         masterId: cat.id === cat.masterId ? null : cat.masterId,
       }));
-      mainCategories = buildTree(modifiedCategories);
-      loading = false;
-      render();
+      const tree = buildTree(modifiedCategories);
+      setMainCategories(tree);
+      setLoading(false);
     } else {
       console.error("Error: Kategori Segmentasyonu çalışmıyor");
     }
   };
 
-  const buildTree = (categories, parentMainCategory = null, depth = 0) => {
+  const buildTree = (categories, parentMainCategory = null) => {
     const tree = [];
     for (const cat of categories) {
       if (
         (parentMainCategory === null && cat.masterId === null) ||
         cat.masterId === parentMainCategory
       ) {
-        const catNode = { ...cat };
-        const children = buildTree(categories, cat.id, depth + 1);
-        if (children.length > 0) {
-          catNode.children = children;
-        }
-        tree.push({ ...catNode, depth });
+        const children = buildTree(categories, cat.id);
+        tree.push({
+          ...cat,
+          children: children.length > 0 ? children : undefined,
+        });
       }
     }
     return tree;
   };
 
   const changeCat = (nodeId) => {
-    TreeNodes = TreeNodes.includes(nodeId)
-      ? TreeNodes.filter((id) => id !== nodeId)
-      : [...TreeNodes, nodeId];
-    render();
+    setTreeNodes((prev) =>
+      prev.includes(nodeId) ? prev.filter((id) => id !== nodeId) : [...prev, nodeId]
+    );
   };
 
   const handleNodeClick = (node) => {
-    selectedNodeId = node.id;
+    setSelectedNodeId(node.id);
     changeCat(node.id);
     selectCategory([{ name: node.name, id: node.id }]);
   };
 
   const renderCategoryList = (nodes, depth = 0) => {
-    const ul = document.createElement("ul");
-    Object.assign(ul.style, styles.ul);
-
-    nodes.forEach((node) => {
-      const li = document.createElement("li");
-      li.style.paddingLeft = `${depth * 12}px`;
-
-      const div = document.createElement("div");
-      const isActive = selectedNodeId === node.id;
-      Object.assign(div.style, styles.categoryLink(isActive));
-      div.addEventListener("click", () => handleNodeClick(node));
-
-      const icon = document.createElement("span");
-      icon.className = node.masterId === null ? "folder-icon" : "content-icon";
-      Object.assign(icon.style, styles.icon);
-      div.appendChild(icon);
-
-      const text = document.createElement("span");
-      text.style.flexGrow = "1";
-      text.textContent = node.name;
-      div.appendChild(text);
-
-      if (node.children) {
-        const toggleIcon = document.createElement("span");
-        toggleIcon.className = "span-icon";
-        Object.assign(toggleIcon.style, styles.toggleIcon);
-        toggleIcon.addEventListener("click", (e) => {
-          e.stopPropagation();
-          changeCat(node.id);
-        });
-        toggleIcon.innerHTML = TreeNodes.includes(node.id) ? "-" : "+";
-        div.appendChild(toggleIcon);
-      }
-
-      li.appendChild(div);
-
-      const childContainer = document.createElement("div");
-      childContainer.className = "tree-content";
-      Object.assign(childContainer.style, styles.childContainer);
-      childContainer.style.maxHeight = TreeNodes.includes(node.id)
-        ? "100px"
-        : "0";
-
-      if (node.children && TreeNodes.includes(node.id)) {
-        childContainer.appendChild(
-          renderCategoryList(node.children, depth + 1)
-        );
-      }
-
-      li.appendChild(childContainer);
-      ul.appendChild(li);
-    });
-
-    return ul;
+    return (
+      <ul style={styles.ul}>
+        {nodes.map((node) => (
+          <li key={node.id} style={{ paddingLeft: `${depth * 12}px` }}>
+            <div
+              style={styles.categoryLink(selectedNodeId === node.id)}
+              onClick={() => handleNodeClick(node)}
+            >
+              <span className={node.masterId === null ? "folder-icon" : "content-icon"} style={styles.icon} />
+              <span style={{ flexGrow: '1' }}>{node.name}</span>
+              {node.children && (
+                <span
+                  className="span-icon"
+                  style={styles.toggleIcon}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    changeCat(node.id);
+                  }}
+                >
+                  {treeNodes.includes(node.id) ? '-' : '+'}
+                </span>
+              )}
+            </div>
+            {node.children && (
+              <div className="tree-content" style={{ ...styles.childContainer, maxHeight: treeNodes.includes(node.id) ? "100px" : "0" }}>
+                {renderCategoryList(node.children, depth + 1)}
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    );
   };
 
   const render = () => {
-    const app = document.getElementById("app");
-    app.innerHTML = "";
     if (loading) {
-      app.innerHTML = "<p>Loading categories...</p>";
-    } else {
-      app.appendChild(renderCategoryList(mainCategories, 0));
+      return <p>Loading categories...</p>;
     }
+    return renderCategoryList(mainCategories);
   };
 
-  init();
-}
+  return <div id="app">{render()}</div>;
+};
+
 const styles = {
   ul: {
     listStyle: "none",
     fontFamily: "Arial, sans-serif",
     padding: "0",
     margin: "0",
-  },
-  li: {
-    paddingLeft: "12px",
   },
   categoryLink: (isActive) => ({
     cursor: "pointer",
@@ -148,4 +125,4 @@ const styles = {
   },
 };
 
-module.exports = mttree;
+export default MtTree;

@@ -1,5 +1,5 @@
 {
-  "name": "dynamic-mttree",
+  "name": "MtTree",
   "version": "1.0.0",
   "description": "Provides a simple collapsible tree structure for displaying nested data",
   "main": "index.js",
@@ -10,8 +10,18 @@
     "npm",
     "tree",
     "simpletree",
-    "dynamictree"
+    "dynamictree",
+    "react",
+    "react-component"
   ],
   "author": "Can Yıldırım",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Canzz0/MTTree.git"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  }
 }

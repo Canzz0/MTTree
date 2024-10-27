@@ -1,7 +1,9 @@
-# Mttree
+# MtTree
 
-Mttree provides a simple collapsible tree structure for displaying nested data, making it easy to manage hierarchical information.
+MtTree provides a simple collapsible tree structure for displaying nested data, making it easy to manage hierarchical information.
 
+
+![MtTree Example](./image.png)
 ## Features
 
 - **Simplicity**: Designed to be intuitive and easy to use.
@@ -61,20 +63,23 @@ Here's an example of how to structure the `category` prop:
 ```
 
 # Installation
-You can install Mttree via npm:
+You can install MtTree via npm:
 ```bash
-npm install mttree
+npm install MtTree
 ```
 
 # Usage
 
 ```javascript
-import mttree from 'mttree';
+import MtTree from 'MtTree';
 
 const categories = [ /* your categories here */ ];
 const selectCategory = (selected) => {
   console.log("Selected category:", selected);
 };
 
-mttree(categories, selectCategory);
+return(
+  <>
+  <MtTree categories={categories} selectCategory={selectCategory} />
+)
 ```
