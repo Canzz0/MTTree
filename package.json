@@ -1,6 +1,6 @@
 {
-  "name": "MtTree",
-  "version": "1.0.0",
+  "name": "mttreeview",
+  "version": "1.0.1",
   "description": "Provides a simple collapsible tree structure for displaying nested data",
   "main": "index.js",
   "scripts": {

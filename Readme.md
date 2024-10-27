@@ -71,7 +71,7 @@ npm install MtTree
 # Usage
 
 ```javascript
-import MtTree from 'MtTree';
+import MtTree from 'mttreeview';
 
 const categories = [ /* your categories here */ ];
 const selectCategory = (selected) => {

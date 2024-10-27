@@ -54,48 +54,52 @@ const MtTree = ({ category, selectCategory }) => {
   };
 
   const renderCategoryList = (nodes, depth = 0) => {
-    return (
-      <ul style={styles.ul}>
-        {nodes.map((node) => (
-          <li key={node.id} style={{ paddingLeft: `${depth * 12}px` }}>
-            <div
-              style={styles.categoryLink(selectedNodeId === node.id)}
-              onClick={() => handleNodeClick(node)}
-            >
-              <span className={node.masterId === null ? "folder-icon" : "content-icon"} style={styles.icon} />
-              <span style={{ flexGrow: '1' }}>{node.name}</span>
-              {node.children && (
-                <span
-                  className="span-icon"
-                  style={styles.toggleIcon}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    changeCat(node.id);
-                  }}
-                >
-                  {treeNodes.includes(node.id) ? '-' : '+'}
-                </span>
-              )}
-            </div>
-            {node.children && (
-              <div className="tree-content" style={{ ...styles.childContainer, maxHeight: treeNodes.includes(node.id) ? "100px" : "0" }}>
-                {renderCategoryList(node.children, depth + 1)}
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+    return React.createElement(
+      'ul',
+      { style: styles.ul },
+      nodes.map((node) =>
+        React.createElement(
+          'li',
+          { key: node.id, style: { paddingLeft: `${depth * 12}px` } },
+          React.createElement(
+            'div',
+            {
+              style: styles.categoryLink(selectedNodeId === node.id),
+              onClick: () => handleNodeClick(node),
+            },
+            React.createElement('span', { className: node.masterId === null ? "folder-icon" : "content-icon", style: styles.icon }),
+            React.createElement('span', { style: { flexGrow: '1' } }, node.name),
+            node.children && React.createElement(
+              'span',
+              {
+                className: "span-icon",
+                style: styles.toggleIcon,
+                onClick: (e) => {
+                  e.stopPropagation();
+                  changeCat(node.id);
+                }
+              },
+              treeNodes.includes(node.id) ? '-' : '+'
+            ),
+          ),
+          node.children && React.createElement(
+            'div',
+            { className: "tree-content", style: { ...styles.childContainer, maxHeight: treeNodes.includes(node.id) ? "100px" : "0" } },
+            renderCategoryList(node.children, depth + 1)
+          )
+        )
+      )
     );
   };
 
   const render = () => {
     if (loading) {
-      return <p>Loading categories...</p>;
+      return React.createElement('p', null, 'Loading categories...');
     }
     return renderCategoryList(mainCategories);
   };
 
-  return <div id="app">{render()}</div>;
+  return React.createElement('div', { id: "app" }, render());
 };
 
 const styles = {
